@@ -15,15 +15,15 @@ ArbolBinario crearNodo(int x)
 {
     ArbolBinario nuevoNodo = new (struct nodo);
     nuevoNodo->nro = x;
-    nuevoNodo->izq = NULL;
-    nuevoNodo->der = NULL;
+    nuevoNodo->izq = nullptr;
+    nuevoNodo->der = nullptr;
     return nuevoNodo;
 }
 
 // Insertar nodo
 void insertar(ArbolBinario &arbol, int x)
 {
-    if (arbol == NULL)
+    if (arbol == nullptr)
         arbol = crearNodo(x);
     else if (x < arbol->nro)
         insertar(arbol->izq, x);
@@ -32,15 +32,22 @@ void insertar(ArbolBinario &arbol, int x)
 }
 
 // Buscar valor en los nodos
-bool buscar(ArbolBinario &arbol, int x)
+bool busqueda(ArbolBinario &arbol, int x)
 {
-    return false;
+    if (arbol == nullptr)
+        return false;
+    else if (x == arbol->nro)
+        return true;
+    else if (x < arbol->nro)
+        return busqueda(arbol->izq, x);
+    else if (x >  arbol->nro)
+        return busqueda(arbol->der, x);
 }
 
 // Recorrido PreOrden
 void preOrden(ArbolBinario arbol)
 {
-    if (arbol != NULL)
+    if (arbol != nullptr)
     {
         cout << arbol->nro << " ";
         preOrden(arbol->izq);
@@ -51,7 +58,7 @@ void preOrden(ArbolBinario arbol)
 // Recorrido EnOrden
 void enOrden(ArbolBinario arbol)
 {
-    if (arbol != NULL)
+    if (arbol != nullptr)
     {
         enOrden(arbol->izq);
         cout << arbol->nro << " ";
@@ -61,7 +68,7 @@ void enOrden(ArbolBinario arbol)
 // Recorrido PostOrden
 void postOrden(ArbolBinario arbol)
 {
-    if (arbol != NULL)
+    if (arbol != nullptr)
     {
         postOrden(arbol->izq);
         postOrden(arbol->der);
@@ -88,7 +95,9 @@ int main()
     preOrden(arbol);
     cout << "\nPost Orden : ";
     postOrden(arbol);
-    cout << endl
-         << endl;
+    cout << endl;
+    cout << "\nBúsqueda de 0 en ArbolBinario\n";
+    cout << ((busqueda(arbol, 0))? "Encontrado": "No encontrado")<< endl;
+
     return 0;
 }
