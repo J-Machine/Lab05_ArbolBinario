@@ -1,159 +1,154 @@
 #include <iostream>
-
+#include <cstdlib>
 using namespace std;
-struct nodo
+
+template <class T>
+class Nodo
 {
-    int nro;
-    struct nodo *izq, *der, *padre;
+public:
+    T dato;
+    Nodo<T> *hijo[2];
+
+    Nodo(T d)
+    {
+        dato = d;
+        hijo[0] = 0;
+        hijo[1] = 0;
+    }
 };
 
-typedef struct nodo *ArbolBinario;
-
-// Crear Nodo
-ArbolBinario crearNodo(int x, ArbolBinario padre)
+template <class T>
+class Binary_Tree
 {
-    ArbolBinario nuevoNodo = new (struct nodo);
-    nuevoNodo->nro = x;
-    nuevoNodo->izq = nullptr;
-    nuevoNodo->der = nullptr;
-    nuevoNodo->padre = padre;
-    return nuevoNodo;
-}
+public:
+    Nodo<T> *raiz;
 
-// Insertar nodo
-void insertar(ArbolBinario &arbol, int x)
-{
-    if (arbol == nullptr)
-        arbol = crearNodo(x, nullptr);
-    else if (x < arbol->nro)
-        insertar(arbol->izq, x);
-    else if (x > arbol->nro)
-        insertar(arbol->der, x);
-}
+public:
+    Binary_Tree() : raiz(0){};
 
-// ** ELIMINAR NODO **
-// Función aux. encontrar mínimo de una rama
-ArbolBinario nodoMinimo(ArbolBinario &arbol)
-{
-    if(arbol == nullptr) 
-        return nullptr;
-    else if (arbol->izq)
-        return nodoMinimo(arbol->izq);
-    else 
-        return arbol;
-
-}
-void reemplazar(ArbolBinario &arbol, ArbolBinario &nuevoNodo)
-{
-
-}
-// Función aux. Eliminar nodo específico
-void eliminarNodo(ArbolBinario &arbol)
-{
-    if(arbol->der && arbol->izq)            // Tiene 2 hijos
+    void insert(const T &d)
     {
 
-    }   
-    else if (arbol->izq)                    // Tiene 1 hijo izquierdo
-    {
-        // reemplazar(arbol, arbol->izq)
-        // destruirNodo(arbol)
+        Nodo<T> *aux = raiz;
+        while (aux != nullptr)
+        {
+            if (aux->hijo[aux->dato < d])
+            {
+                aux = aux->hijo[aux->dato < d];
+            }
+            else
+            {
+                break;
+            }
+        }
 
-    } 
-    else if (arbol->der)                    // Tiene 1 hijo derecho
-    {
-        // reemplazar(arbol, arbol->der)
-        // destruirNodo(arbol)
-    } 
-    else                                    // No tiene hijos
-    {
-        // reemplazar(arbol, nullptr)
-        // destruirNodo(arbol)
+        if (raiz == nullptr)
+        {
+            Nodo<T> *newnodo = new Nodo<T>(d);
+            raiz = newnodo;
+        }
+        else if (aux->dato == d)
+        {
+        }
+        else
+        {
+            Nodo<T> *newnodo = new Nodo<T>(d);
+            aux->hijo[aux->dato < d] = newnodo;
+        }
     }
-}
-//* Eliminar nodo (de acuerdo a valor que contiene)
-void eliminar(ArbolBinario &arbol, int x)
-{
-    if(arbol == nullptr)
-        return;
-    else if(x < arbol->nro)
-        eliminar(arbol->izq, x);
-    else if (x > arbol->nro)
-        eliminar(arbol->der, x);
-    else                            // x es igual al valor del nodo arbol
-    {
-        eliminarNodo(arbol);
-    }
-    
-}
 
-// Buscar valor en los nodos
-bool busqueda(ArbolBinario &arbol, int x)
-{
-    if (arbol == nullptr)
-        return false;
-    else if (x == arbol->nro)
-        return true;
-    else if (x < arbol->nro)
-        return busqueda(arbol->izq, x);
-    else if (x >  arbol->nro)
-        return busqueda(arbol->der, x);
-}
+    bool find(const T &d, Nodo<T> *p)
+    {
+        if (p == nullptr)
+            return false;
+        if (p->dato == d)
+            return true;
+        else if(p->dato > d)
+            return find(d, p->hijo[0]);
+        else if(p->dato < d)
+            return find(d, p->hijo[1]);
+    }
 
-// Recorrido PreOrden
-void preOrden(ArbolBinario arbol)
-{
-    if (arbol != nullptr)
+    bool find(const T &d)
     {
-        cout << arbol->nro << " ";
-        preOrden(arbol->izq);
-        preOrden(arbol->der);
+        return find(d, raiz);
     }
-}
 
-// Recorrido EnOrden
-void enOrden(ArbolBinario arbol)
-{
-    if (arbol != nullptr)
+    Nodo<T> *findMin(Nodo<T> *t) const
     {
-        enOrden(arbol->izq);
-        cout << arbol->nro << " ";
-        enOrden(arbol->der);
+        if (t == nullptr)
+            return nullptr;
+        if (t->hijo[0] == nullptr)
+            return t;
+        return findMin(t->hijo[0]);
     }
-}
-// Recorrido PostOrden
-void postOrden(ArbolBinario arbol)
-{
-    if (arbol != nullptr)
+
+    void remove(const T &x, Nodo<T> *&t)
     {
-        postOrden(arbol->izq);
-        postOrden(arbol->der);
-        cout << arbol->nro << " ";
+        if (t == nullptr)
+            return;
+        if (x < t->dato)
+            remove(x, t->hijo[0]);
+        else if (t->dato < x)
+            remove(x, t->hijo[1]);
+        else if (t->hijo[0] != nullptr && t->hijo[1] != nullptr)
+        {
+            t->dato = findMin(t->hijo[1])->dato;
+            remove(t->dato, t->hijo[1]);
+        }
+        else
+        {
+            Nodo<T> *aux = t;
+            t = (t->hijo[0] != nullptr) ? t->hijo[0] : t->hijo[1];
+            delete aux;
+        }
     }
-}
+
+    void eliminar(const T &x)
+    {
+        remove(x, raiz);
+    }
+
+    void inorder(Nodo<T> *tmp)
+    {
+        if (!tmp)
+            return;
+        inorder(tmp->hijo[0]);
+        cout << tmp->dato << " ";
+        inorder(tmp->hijo[1]);
+    }
+
+    void print()
+    {
+        inorder(raiz);
+    }
+};
+
 int main()
 {
-    ArbolBinario arbol = nullptr;
+    Binary_Tree<int> A;
+
     cout << "\nEJEMPLO DE ARBOL BINARIO\n";
-    insertar(arbol, 4);
-    insertar(arbol, 8);
-    insertar(arbol, 2);
-    insertar(arbol, 9);
-    insertar(arbol, 3);
-    insertar(arbol, 6);
-    insertar(arbol, 1);
-    insertar(arbol, 7);
-    insertar(arbol, 5);
-    cout << "\nRecorridos del ArbolBinario\n";
-    cout << "\nEn orden : ";
-    enOrden(arbol);
-    cout << "\nPre Orden : ";
-    preOrden(arbol);
-    cout << "\nPost Orden : ";
-    postOrden(arbol);
+    A.insert(6);
+    A.insert(2);
+    A.insert(8);
+    A.insert(1);
+    A.insert(4);
+    A.insert(3);
+    A.print();
     cout << endl;
-    cout << "\nBúsqueda de 0 en ArbolBinario\n";
-    cout << ((busqueda(arbol, 0))? "Encontrado": "No encontrado")<< endl;
+
+    cout << "\nBuscar elemento 4 en el arbol binario: \n"
+         << (A.find(4) ? "Encontrado": "No encontrado")<< endl;
+
+    cout << "\nEliminar elemento 4 del arbol binario: \n";
+    A.eliminar(4);
+    A.print();
+    cout << endl;
+
+    cout << "\nBuscar elemento 4 en el arbol binario: \n"
+         << (A.find(4)? "Encontrado": "No encontrado")<< endl;
+    cout << endl;
 
     return 0;
 }
