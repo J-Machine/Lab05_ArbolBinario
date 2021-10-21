@@ -264,7 +264,7 @@ int main()
          << (A.find(4) ? "Encontrado" : "No encontrado") << endl;
 
     cout << "\nEliminar elemento 4 del arbol binario: \n";
-    A.eliminar(4);
+    cout<<(A.eliminar(4)? "Eliminado": "No eliminado, no se encuentra")<< endl;
     A.inorder();
     cout << endl;
 
