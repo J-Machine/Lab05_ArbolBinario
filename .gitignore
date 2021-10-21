@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+#othwers
+*.dot
+*.vscode
+main

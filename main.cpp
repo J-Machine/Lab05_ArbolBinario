@@ -1,5 +1,4 @@
-#include <iostream>
-#include <cstdlib>
+#include <bits/stdc++.h>
 using namespace std;
 
 template <class T>
@@ -18,21 +17,28 @@ public:
 };
 
 template <class T>
-class Binary_Tree
+class ArbolBinarioBusqueda
 {
 public:
     Nodo<T> *raiz;
 
 public:
-    Binary_Tree() : raiz(0){};
+    /////////////////////CONSTRUCTOR//////////////////////////////////
+    ArbolBinarioBusqueda() : raiz(0){};
 
+    /////////////////////INSERTAR//////////////////////////////////
     void insert(const T &d)
     {
 
         Nodo<T> *aux = raiz;
         while (aux != nullptr)
         {
-            if (aux->hijo[aux->dato < d])
+
+            if (aux->dato == d)
+            {
+                return;
+            }
+            else if (aux->hijo[aux->dato < d])
             {
                 aux = aux->hijo[aux->dato < d];
             }
@@ -47,9 +53,6 @@ public:
             Nodo<T> *newnodo = new Nodo<T>(d);
             raiz = newnodo;
         }
-        else if (aux->dato == d)
-        {
-        }
         else
         {
             Nodo<T> *newnodo = new Nodo<T>(d);
@@ -57,15 +60,16 @@ public:
         }
     }
 
+    //////////////////////BUSCAR//////////////////////////////////
     bool find(const T &d, Nodo<T> *p)
     {
         if (p == nullptr)
             return false;
         if (p->dato == d)
             return true;
-        else if(p->dato > d)
+        else if (p->dato > d)
             return find(d, p->hijo[0]);
-        else if(p->dato < d)
+        else if (p->dato < d)
             return find(d, p->hijo[1]);
     }
 
@@ -83,6 +87,7 @@ public:
         return findMin(t->hijo[0]);
     }
 
+    //////////////////////ELIMINAR//////////////////////////////////
     void remove(const T &x, Nodo<T> *&t)
     {
         if (t == nullptr)
@@ -104,11 +109,21 @@ public:
         }
     }
 
-    void eliminar(const T &x)
+    //////////////////////ELIMINAR//////////////////////////////////
+    bool eliminar(const T &x)
     {
-        remove(x, raiz);
+        if (find(x))
+        {
+            remove(x, raiz);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
+    //////////////////////INORDER//////////////////////////////////
     void inorder(Nodo<T> *tmp)
     {
         if (!tmp)
@@ -118,37 +133,164 @@ public:
         inorder(tmp->hijo[1]);
     }
 
-    void print()
+    //////////////////////PREORDER//////////////////////////////////
+    void preorder(Nodo<T> *tmp)
+    {
+        if (!tmp)
+            return;
+        cout << tmp->dato << " ";
+        preorder(tmp->hijo[0]);
+        preorder(tmp->hijo[1]);
+    }
+
+    //////////////////////POSTORDER//////////////////////////////////
+    void postorder(Nodo<T> *tmp)
+    {
+        if (!tmp)
+            return;
+        postorder(tmp->hijo[0]);
+        postorder(tmp->hijo[1]);
+        cout << tmp->dato << " ";
+    }
+
+    void inorder()
     {
         inorder(raiz);
+    }
+    void preorder()
+    {
+        preorder(raiz);
+    }
+    void postorder()
+    {
+        postorder(raiz);
+    }
+
+    ///////////////////////// CLEAR TREE /////////////////////////
+    void clearNodes(Nodo<T> *_node)
+    {
+        if (_node == nullptr)
+            return;
+        clearNodes(_node->hijo[0]);
+        clearNodes(_node->hijo[1]);
+        cout << "\n Eliminando nodo: " << _node->dato;
+        if (_node == raiz)
+            raiz = 0;
+        else
+            delete _node;
+    }
+
+    void clear()
+    {
+        clearNodes(raiz);
+    }
+    //////////////////////PRINT//////////////////////////////////
+    void print()
+    {
+        if (raiz == nullptr)
+            cout << "El árbol esta vacío \n";
+        else
+            inorder(raiz);
+    }
+
+    //////////////////////GRAFICAR//////////////////////////////////
+    void escribirdot(ofstream &archivo, Nodo<T> *ARBOL, int i)
+    {
+        if (ARBOL)
+        {
+            i++;
+            if (ARBOL->hijo[0])
+            {
+                archivo << ARBOL->dato << " -> " << ARBOL->hijo[0]->dato << "\n";
+            }
+            else
+            {
+                archivo << "izq" << i << " [width=.1,style=invis]";
+                archivo << ARBOL->dato << " -> izq" << i << " [style=invis]"
+                        << "\n";
+            }
+            if (ARBOL->hijo[1])
+            {
+                archivo << ARBOL->dato << " -> " << ARBOL->hijo[1]->dato << "\n";
+            }
+            else
+            {
+                archivo << "der" << i << " [width=.1,style=invis]";
+                archivo << ARBOL->dato << " -> der" << i << " [style=invis]"
+                        << "\n";
+            }
+
+            escribirdot(archivo, ARBOL->hijo[0], i); // recorrer por la derecha
+            escribirdot(archivo, ARBOL->hijo[1], i); // recorrer por la izquierda
+        }
+    }
+
+    void graficar()
+    {
+        ofstream archivo;
+        archivo.open("D:\\Graphviz\\bin\\arbolito.dot");
+        if (archivo.is_open())
+        {
+            archivo << "digraph C { \n";
+            escribirdot(archivo, raiz, 0);
+            archivo << "}\n";
+            archivo.close();
+            system("dot -Tpdf D:\\Graphviz\\bin\\arbolito.dot -o D:\\Graphviz\\bin\\arbolito.pdf ");
+        }
+        else
+        {
+            cout << "error al crear archivo";
+        }
     }
 };
 
 int main()
 {
-    Binary_Tree<int> A;
+    ArbolBinarioBusqueda<int> A;
 
     cout << "\nEJEMPLO DE ARBOL BINARIO\n";
     A.insert(6);
-    A.insert(2);
+    A.insert(5);
+    A.insert(5);
+    A.insert(5);
     A.insert(8);
     A.insert(1);
     A.insert(4);
     A.insert(3);
-    A.print();
+    A.inorder();
     cout << endl;
 
     cout << "\nBuscar elemento 4 en el arbol binario: \n"
-         << (A.find(4) ? "Encontrado": "No encontrado")<< endl;
+         << (A.find(4) ? "Encontrado" : "No encontrado") << endl;
 
     cout << "\nEliminar elemento 4 del arbol binario: \n";
     A.eliminar(4);
-    A.print();
+    A.inorder();
     cout << endl;
 
     cout << "\nBuscar elemento 4 en el arbol binario: \n"
-         << (A.find(4)? "Encontrado": "No encontrado")<< endl;
+         << (A.find(4) ? "Encontrado" : "No encontrado") << endl;
     cout << endl;
+
+    cout << "Arbol en InOrden: ";
+    A.inorder();
+    cout << endl;
+    cout << "Arbol en PostOrden: ";
+    A.postorder();
+    cout << endl;
+    cout << "Arbol en PreOrden: ";
+    A.preorder();
+    cout << endl;
+
+    cout << "\nEliminar nodos del arbol binario: \n";
+    A.clear();    
+    cout << endl;
+    A.print();
+    cout << endl;
+
+    cout << "Grafico del arbol: ";
+    A.graficar();
+    system("D:\\Graphviz\\bin\\arbol.png");
 
     return 0;
 }
